@@ -4,41 +4,64 @@ using static System.Console;
 
 namespace Stajs.Mazed.Core
 {
-	[Flags]
-	public enum Walls
-	{
-		North,
-		East,
-		South,
-		West
-	}
-
 	public class Grid
 	{
 		public Cell[,] Cells { get; }
 
 		public Grid()
 		{
-			Cells = new Cell[5, 16];
+			Cells = new Cell[3, 3];
 
-			for (var i = 0; i < Cells.GetLength(0); i++)
+			var height = Cells.GetLength(0);
+			var width = Cells.GetLength(1);
+			var lastRow = Cells.GetUpperBound(0);
+			var lastCol = Cells.GetUpperBound(1);
+
+			for (var row = 0; row < height; row++)
 			{
-				for (var j = 0; j < Cells.GetLength(1); j++)
+				for (var col = 0; col < width; col++)
 				{
-					Cells[i, j] = new Cell
+					var cell = new Cell
 					{
-						Walls = Walls.North | Walls.East | Walls.South | Walls.West
+						AvailableDirections = Directions.North | Directions.East | Directions.South | Directions.West
 					};
+
+					if (row == 0)
+						cell.RemoveDirection(Directions.North);
+
+					if (col == 0)
+						cell.RemoveDirection(Directions.West);
+
+					if (col == lastCol)
+						cell.RemoveDirection(Directions.East);
+
+					if (row == lastRow)
+						cell.RemoveDirection(Directions.South);
+
+					Cells[row, col] = cell;
 				}
 			}
-
-			//Cells[0, 0].IsEntry = true;
-			//Cells[1, 2].IsExit = true;
 		}
 
 		public Grid(Cell[,] cells)
 		{
 			Cells = cells;
+		}
+
+		public void Carve()
+		{
+			var currentCell = Cells[0, 0];
+			currentCell.RemoveDirection(Directions.East);
+
+			var seed = 12;
+			var random = new Random(seed);
+
+
+		}
+
+		private void Remove(Directions wall)
+		{
+			
 		}
 
 		public void Print()
