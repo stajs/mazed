@@ -19,7 +19,7 @@ namespace Stajs.Mazed.Core
 
 		public Grid()
 		{
-			Cells = new Cell[6, 3];
+			Cells = new Cell[5, 16];
 
 			for (var i = 0; i < Cells.GetLength(0); i++)
 			{
@@ -32,8 +32,8 @@ namespace Stajs.Mazed.Core
 				}
 			}
 
-			Cells[0, 0].IsEntry = true;
-			Cells[5, 2].IsExit = true;
+			//Cells[0, 0].IsEntry = true;
+			//Cells[1, 2].IsExit = true;
 		}
 
 		public Grid(Cell[,] cells)
@@ -43,38 +43,36 @@ namespace Stajs.Mazed.Core
 
 		public void Print()
 		{
-			for (var i = 0; i < Cells.GetLength(0); i++)
-			{
-				for (var j = 0; j < Cells.GetLength(1); j++)
-				{
-					var oldColor = ForegroundColor;
-					var cell = Cells[i, j];
+			//for (var i = 0; i < Cells.GetLength(0); i++)
+			//{
+			//	for (var j = 0; j < Cells.GetLength(1); j++)
+			//	{
+			//		var oldColor = ForegroundColor;
+			//		var cell = Cells[i, j];
 
-					if (cell.IsEntry)
-						ForegroundColor = ConsoleColor.Green;
-					else if (cell.IsExit)
-						ForegroundColor = ConsoleColor.Red;
-					else
-						ForegroundColor = ConsoleColor.White;
+			//		if (cell.IsEntry)
+			//			ForegroundColor = ConsoleColor.Green;
+			//		else if (cell.IsExit)
+			//			ForegroundColor = ConsoleColor.Red;
+			//		else
+			//			ForegroundColor = ConsoleColor.White;
 
-					Write($"{i}{j}");
-					ForegroundColor = oldColor;
-					Write(":");
-				}
+			//		Write($"{i}{j}");
+			//		ForegroundColor = oldColor;
+			//		Write(":");
+			//	}
 
-				WriteLine();
-			}
+			//	WriteLine();
+			//}
 
-			WriteLine();
+			//WriteLine();
 
-			var width = Cells.GetLength(0);
-			var height = Cells.GetLength(1);
+			var height = Cells.GetLength(0);
+			var width = Cells.GetLength(1);
+			var lastRow = Cells.GetUpperBound(0);
+			var lastCol = Cells.GetUpperBound(1);
 
-			WriteLine("|0|1|2|");
-
-			var sb = new StringBuilder();
-
-			for (var row = 0; row < height + 2; row++)
+			for (var row = 0; row < height; row++)
 			{
 				if (row == 0)
 				{
@@ -93,16 +91,19 @@ namespace Stajs.Mazed.Core
 
 				for (var col = 0; col < width + 1; col++)
 				{
-					if (row%2 == 0)
-					{
-						if (col == 0)
-							Write("║" + col);
-						else if (col == width)
-							Write("║");
-						else
-							Write("│" + col);
-					}
+					if (col == 0)
+						Write("║" + row);
+					else if (col == width)
+						Write("║");
 					else
+						Write("│" + row);
+				}
+
+				WriteLine();
+
+				if (row != lastRow)
+				{
+					for (var col = 0; col < width + 1; col++)
 					{
 						if (col == 0)
 							Write("╟─");
@@ -110,25 +111,20 @@ namespace Stajs.Mazed.Core
 							Write("╢");
 						else
 							Write("┼─");
-
 					}
-				}
 
-				if (row == height + 1)
-				{
 					WriteLine();
-					for (var col = 0; col < width + 1; col++)
-					{
-						if (col == 0)
-							Write("╚═");
-						else if (col == width)
-							Write("╝");
-						else
-							Write("╧═");
-					}
 				}
+			}
 
-				WriteLine();
+			for (var col = 0; col < width + 1; col++)
+			{
+				if (col == 0)
+					Write("╚═");
+				else if (col == width)
+					Write("╝");
+				else
+					Write("╧═");
 			}
 		}
 	}
