@@ -11,8 +11,8 @@ namespace Stajs.Mazed.CommandLine
 			var grid = new Grid();
 
 			Console.OutputEncoding = Encoding.UTF8;
-			grid.Print();
 			grid.Carve();
+			grid.Print2();
 			Console.ReadKey();
 		}
 	}
