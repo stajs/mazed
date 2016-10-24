@@ -87,7 +87,8 @@ namespace Stajs.Mazed.Core
 
 		public void Carve()
 		{
-			var seed = 29;
+			var seed = 297237;
+			seed = 6954;
 			var random = new Random(seed);
 
 			//Entry;
@@ -99,7 +100,7 @@ namespace Stajs.Mazed.Core
 
 			var safety = 0;
 
-			while (cell.AvailableDirections.Any() && safety++ < 100)
+			while (cell.AvailableDirections.Any() && safety++ < 200)
 			{
 				Thread.Sleep(TimeSpan.FromMilliseconds(20));
 
