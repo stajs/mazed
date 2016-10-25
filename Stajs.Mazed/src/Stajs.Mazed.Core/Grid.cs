@@ -23,7 +23,7 @@ namespace Stajs.Mazed.Core
 			{
 				for (var col = 0; col < width; col++)
 				{
-					Cells[row, col] = new Cell($"{row}:{col}");
+					Cells[row, col] = new Cell(col, row);
 				}
 			}
 
@@ -91,39 +91,221 @@ namespace Stajs.Mazed.Core
 			seed = 6954;
 			var random = new Random(seed);
 
+
+			var lastRow = Cells.GetUpperBound(0);
+			var lastCol = Cells.GetUpperBound(1);
+
 			//Entry;
 			var cell = Cells[0, 0];
 			cell.RemoveWall(Direction.West);
 			cell.HasBeenVisited = true;
-			this.Current = cell;
-			Print2(ConsoleColor.Red);
+			Current = cell;
+			Print();
+
+			PrintWallRemoval(cell, Direction.West);
 
 			var safety = 0;
 
-			while (cell.AvailableDirections.Any() && safety++ < 200)
+			while (cell.AvailableDirections.Any() && safety++ < 233)
 			{
-				Thread.Sleep(TimeSpan.FromMilliseconds(20));
+				Thread.Sleep(TimeSpan.FromMilliseconds(30));
+
+				if (cell.Row == lastRow && cell.Column == lastCol)
+				{
+					cell.RemoveWall(Direction.East);
+					PrintWallRemoval(cell, Direction.East);
+				}
 
 				var direction = cell.AvailableDirections[random.Next(cell.AvailableDirections.Count)];
 				cell.RemoveWall(direction);
+				PrintWallRemoval(cell, direction);
 				cell = cell.Move(direction);
 				cell.HasBeenVisited = true;
-				this.Current = cell;
-
-				Print2(ConsoleColor.Red);
+				Current = cell;
 
 				SetCursorPosition(60, 20);
 				ForegroundColor = ConsoleColor.Yellow;
 				Write($"Iterations: {safety}");
 			}
-
-			Print2();
-
 		}
 
 		public Cell Current { get; set; }
 
-		public void Print2(ConsoleColor color = ConsoleColor.Green)
+		public void PrintWallRemoval(Cell cell, Direction direction)
+		{
+			var x = cell.Column * 2 + 1;
+			var y = cell.Row * 2 + 1;
+
+			var lastRow = Cells.GetUpperBound(0);
+			var lastCol = Cells.GetUpperBound(1);
+
+			SetCursorPosition(x, y);
+			ForegroundColor = ConsoleColor.Gray;
+			//Write(" ");
+
+			switch (direction)
+			{
+				case Direction.North:
+					Write("↑");
+					y--;
+					break;
+
+				case Direction.East:
+					Write("→");
+					x++;
+					break;
+
+				case Direction.South:
+					Write("↓");
+					y++;
+					break;
+
+				case Direction.West:
+					Write("←");
+					x--;
+					break;
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+			}
+
+			ForegroundColor = ConsoleColor.Red;
+
+			SetCursorPosition(x, y);
+			//Write(direction.ToString().First());
+			Write(" ");
+
+			var hasNorthWall = cell.NorthWall != null;
+			var hasEastWall = cell.EastWall != null;
+			var hasSouthWall = cell.SouthWall != null;
+			var hasWestWall = cell.WestWall != null;
+
+			var hasNorthEastWall = cell.NorthCell?.EastWall != null;
+			var hasEastNorthWall = cell.EastCell?.NorthWall != null;
+
+			var hasNorthWestWall = cell.NorthCell?.WestWall != null;
+			var hasWestNorthWall = cell.WestCell?.NorthWall != null;
+
+			var hasSouthWestWall = cell.SouthCell?.WestWall != null;
+			var hasWestSouthWall = cell.WestCell?.SouthWall != null;
+
+			var hasSouthEastWall = cell.SouthCell?.EastWall != null;
+			var hasEastSouthWall = cell.EastCell?.SouthWall != null;
+
+			if (direction == Direction.North)
+			{
+				SetCursorPosition(x + 1, y);
+
+				if (cell.Column == lastCol)
+					Write("│");
+				else if (hasEastWall && hasNorthEastWall && hasEastNorthWall)
+					Write("├");
+				else if (!hasEastWall && hasNorthEastWall && hasEastNorthWall)
+					Write("└");
+				else if (hasEastWall && !hasNorthEastWall && hasEastNorthWall)
+					Write("│");
+				else
+					Write("╵");
+
+				SetCursorPosition(x - 1, y);
+
+				if (cell.Column == 0)
+					Write("│");
+				else if (hasWestWall && hasNorthWestWall && hasWestNorthWall)
+					Write("┤");
+				else if (!hasWestWall && hasNorthWestWall && hasWestNorthWall)
+					Write("┘");
+				else if (hasWestWall && !hasNorthWestWall && hasWestNorthWall)
+					Write("│");
+				else
+					Write("╵");
+			}
+
+			if (direction == Direction.South)
+			{
+				SetCursorPosition(x + 1, y);
+
+				if (cell.Column == lastCol)
+					Write("│");
+				else if (hasEastWall && hasSouthEastWall && hasEastSouthWall)
+					Write("├");
+				else if (!hasEastWall && hasSouthEastWall && hasEastSouthWall)
+					Write("┌");
+				else if (hasEastWall && !hasSouthEastWall && hasEastSouthWall)
+					Write("│");
+				else
+					Write("╷");
+
+				SetCursorPosition(x - 1, y);
+
+				if (cell.Column == 0)
+					Write("│");
+				else if (hasWestWall && hasSouthWestWall && hasWestSouthWall)
+					Write("┤");
+				else if (!hasWestWall && hasSouthWestWall && hasWestSouthWall)
+					Write("┐");
+				else if (hasWestWall && !hasSouthWestWall && hasWestSouthWall)
+					Write("│");
+				else
+					Write("╷");
+			}
+
+			if (direction == Direction.East)
+			{
+				SetCursorPosition(x, y - 1);
+
+				if (hasNorthWall && hasNorthEastWall && hasEastNorthWall)
+					Write("┴");
+				else if (!hasNorthWall && hasNorthEastWall && hasEastNorthWall)
+					Write("└");
+				else if (hasNorthWall && !hasNorthEastWall && hasEastNorthWall)
+					Write("─");
+				else
+					Write("╶");
+
+				SetCursorPosition(x, y + 1);
+
+				if (cell.Row == lastRow && cell.Column == lastCol)
+					Write("─");
+				else if (hasSouthWall && hasSouthEastWall && hasEastSouthWall)
+					Write("┬");
+				else if (!hasSouthWall && hasSouthEastWall && hasEastSouthWall)
+					Write("┌");
+				else if (hasSouthWall && !hasSouthEastWall && hasEastSouthWall)
+					Write("─");
+				else
+					Write("╶");
+			}
+
+			if (direction == Direction.West)
+			{
+				SetCursorPosition(x, y - 1);
+
+				if (cell.Row == 0 && cell.Column == 0)
+					Write("─");
+				else if (hasNorthWall && hasNorthWestWall && hasWestNorthWall)
+					Write("┴");
+				else if (!hasNorthWall && hasNorthWestWall && hasWestNorthWall)
+					Write("┘");
+				else if (hasNorthWall && !hasNorthWestWall && hasWestNorthWall)
+					Write("─");
+				else
+					Write("╴");
+
+				SetCursorPosition(x, y + 1);
+
+				if (hasSouthWall && hasSouthWestWall && hasWestSouthWall)
+					Write("┬");
+				else if (!hasSouthWall && hasSouthWestWall && hasWestSouthWall)
+					Write("┐");
+				else if (hasSouthWall && !hasSouthWestWall && hasWestSouthWall)
+					Write("─");
+				else
+					Write("╴");
+			}
+		}
+
+		public void Print(ConsoleColor color = ConsoleColor.Red)
 		{
 			Clear();
 
@@ -221,69 +403,6 @@ namespace Stajs.Mazed.Core
 						Write("┐");
 					}
 				}
-			}
-		}
-
-		public void Print()
-		{
-			var height = Cells.GetLength(0);
-			var width = Cells.GetLength(1);
-			var lastRow = Cells.GetUpperBound(0);
-			var lastCol = Cells.GetUpperBound(1);
-
-			for (var row = 0; row < height; row++)
-			{
-				if (row == 0)
-				{
-					for (var col = 0; col < width + 1; col++)
-					{
-						if (col == 0)
-							Write("╔═");
-						else if (col == width)
-							Write("╗");
-						else
-							Write("╤═");
-					}
-
-					WriteLine();
-				}
-
-				for (var col = 0; col < width + 1; col++)
-				{
-					if (col == 0)
-						Write("║" + row);
-					else if (col == width)
-						Write("║");
-					else
-						Write("│" + row);
-				}
-
-				WriteLine();
-
-				if (row != lastRow)
-				{
-					for (var col = 0; col < width + 1; col++)
-					{
-						if (col == 0)
-							Write("╟─");
-						else if (col == width)
-							Write("╢");
-						else
-							Write("┼─");
-					}
-
-					WriteLine();
-				}
-			}
-
-			for (var col = 0; col < width + 1; col++)
-			{
-				if (col == 0)
-					Write("╚═");
-				else if (col == width)
-					Write("╝");
-				else
-					Write("╧═");
 			}
 		}
 	}

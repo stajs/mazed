@@ -7,7 +7,9 @@ namespace Stajs.Mazed.Core
 {
 	public class Cell
 	{
-		public string Id { get; set; }
+		public int Column { get; private set; }
+		public int Row { get; private set; }
+		public string Id => $"{Row}:{Column}";
 		public Cell NorthCell { get; set; }
 		public Cell EastCell { get; set; }
 		public Cell SouthCell { get; set; }
@@ -41,14 +43,10 @@ namespace Stajs.Mazed.Core
 
 		public bool HasBeenVisited { get; set; }
 
-		public Cell() : this("unknown")
+		public Cell(int column, int row)
 		{
-
-		}
-
-		public Cell(string id)
-		{
-			Id = id;
+			Column = column;
+			Row = row;
 		}
 
 		public void RemoveWall(Direction direction)
